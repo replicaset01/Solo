@@ -14,7 +14,7 @@ public class MultiResDto<T> {
         this.data = data;
         this.pageInfo = new PageInfo(
                 page.getNumber()+1,
-                pageInfo.getSize(),
+                page.getSize(),
                 page.getTotalElements(),
                 page.getTotalPages());
     }
