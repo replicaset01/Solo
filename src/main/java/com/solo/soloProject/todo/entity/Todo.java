@@ -1,29 +1,32 @@
 package com.solo.soloProject.todo.entity;
 
-import lombok.Getter;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Getter
-@Setter
+@Data
 @NoArgsConstructor
-@Entity(name = "SKW")
+@Entity
+@Builder
+@AllArgsConstructor
 public class Todo {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "todo_id")
     private Long todoId;
 
     @Column(nullable = false, length = 15)
     private String title;
 
-    @Column(nullable = false, length = 10, name = "ORDERS")
-    private int order;
+    @Column(nullable = false, length = 10, name = "todo_order")
+    private Long order;
 
     @Column(nullable = false)
-    private boolean completed = false;
+    private Boolean completed;
 
     @Column(nullable = false)
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -31,9 +34,4 @@ public class Todo {
     @Column(nullable = false, name = "LAST_MODIFIED_AT")
     private LocalDateTime modifiedAt = LocalDateTime.now();
 
-    public Todo(String title, int order, boolean completed) {
-        this.title = title;
-        this.order = order;
-        this.completed = completed;
-    }
 }
