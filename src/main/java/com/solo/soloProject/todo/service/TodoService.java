@@ -4,6 +4,7 @@ import com.solo.soloProject.todo.entity.Todo;
 import com.solo.soloProject.error.BusinessException;
 import com.solo.soloProject.error.ExceptionCode;
 import com.solo.soloProject.todo.repository.TodoRepository;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
@@ -22,7 +23,9 @@ public class TodoService {
     }
 
     public Todo createTodo(Todo todo) {
-        return todoRepository.save(todo);
+        verifyExistTodo(todo.getTodoId());
+        Todo savedTodo = todoRepository.save(todo);
+        return savedTodo;
     }
 
     public Todo updateTodo(Todo todo) {

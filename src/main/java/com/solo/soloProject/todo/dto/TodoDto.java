@@ -12,6 +12,7 @@ import javax.validation.constraints.NotNull;
 public class TodoDto {
 
     @Getter
+    @AllArgsConstructor
     public static class Post {
 
         @NotEmpty
@@ -20,6 +21,8 @@ public class TodoDto {
         private int order;
         @NotNull
         private boolean completed;
+
+
     }
 
     @Getter
