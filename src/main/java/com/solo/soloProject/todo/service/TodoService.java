@@ -34,8 +34,6 @@ public class TodoService {
         Optional.ofNullable(dto.getCompleted())
                 .ifPresent(completed -> findTodo.setCompleted(completed));
 
-        findTodo.setModifiedAt(LocalDateTime.now());
-
         return todoRepository.save(findTodo);
     }
 

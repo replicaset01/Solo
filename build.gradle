@@ -3,6 +3,7 @@ plugins {
 	id 'war'
 	id 'org.springframework.boot' version '2.7.6'
 	id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+	id "org.asciidoctor.jvm.convert" version "3.3.2"  // [플러그인 추가]
 }
 
 group = 'com.solo'
@@ -19,7 +20,21 @@ repositories {
 	mavenCentral()
 }
 
+// [스니핏 생성 경로 지정]
+ext {
+	set('snippetsDir', file("build/generated-snippets"))
+}
+
+// [AsciiDoctor에서 사용되는 의존그룹 지정]
+configurations {
+	asciidoctorExtensions
+}
+
 dependencies {
+
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+	asciidoctorExtensions 'org.springframework.restdocs:spring-restdocs-asciidoctor'
+
 	implementation 'org.springframework.boot:spring-boot-starter'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	compileOnly 'org.projectlombok:lombok'
@@ -35,6 +50,36 @@ dependencies {
 
 }
 
+// [:test task 실행 시, 스니핏 디렉토리 경로 지정]
 tasks.named('test') {
+	outputs.dir snippetsDir
 	useJUnitPlatform()
+}
+
+// [:asciidoctor 실행 시, 기능 사용을 위해 task에 asccidoctorExtensions 설정]
+
+tasks.named('asciidoctor') {
+	configurations "asciidoctorExtensions"
+	inputs.dir snippetsDir
+	dependsOn test
+}
+
+// [:build 실행 전 실행되는 task,  :copyDocument 가 실행 되면 index.html이 static 경로에 copy되며,
+//  그 파일은 API Docs를 파일로 외부 제공을 위한 용도로 사용 가능]
+task copyDocument(type: Copy) {
+	dependsOn asciidoctor            // [:asciidoctor 실행 후 task 실행되도록 의존 설정]
+	from file("${asciidoctor.outputDir}")   // [asciidoc 경로에 생성되는 index.html copy]
+	into file("src/main/resources/static/docs")   // [static 경로로 index.html 추가]
+}
+
+build {
+	dependsOn copyDocument  // [:build 가 실행되기 전, :copyDocument 가 선행되도록 설정]
+}
+
+// [App 실행 파일이 생성하는 :bootJar 설정]
+bootJar {
+	dependsOn copyDocument    // [:bootJar 실행 전, :copyDocument 가 선행되도록 의존설정]
+	from("${asciidoctor.outputDir}") {  // [Asciidoctor로 생성되는 index.html을 Jar에 추가]
+		into 'static/docs'
+	}
 }
